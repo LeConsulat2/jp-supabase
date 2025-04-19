@@ -1,19 +1,21 @@
 // src/components/Navbar.tsx
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router'; // For React Router v7
 
-interface NavbarProps {
-  setPage: (page: string) => void;
-}
-
-export const Navbar = ({ setPage }: NavbarProps) => {
+export const Navbar = () => {
+  // Removed setPage prop
   const [menuOpen, setMenuOpen] = useState(false);
   const { signInWithGitHub, user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const displayName = user?.user_metadata.user_name || user?.email;
 
+  // Debug log to check auth state
+  console.log('Current auth state:', user);
+
   const handleClick = (page: string) => {
-    setPage(page);
+    navigate(page === 'home' ? '/' : `/${page}`);
     setMenuOpen(false);
   };
 
