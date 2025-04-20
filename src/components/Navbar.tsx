@@ -1,21 +1,18 @@
 // src/components/Navbar.tsx
 import { useState } from 'react';
+import { Link } from 'react-router'; // Correct import for React Router 6.x
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router'; // For React Router v7
 
 export const Navbar = () => {
-  // Removed setPage prop
   const [menuOpen, setMenuOpen] = useState(false);
-  const { signInWithGitHub, user, signOut } = useAuth();
-  const navigate = useNavigate();
+  const { signInWithGitHub, signOut, user } = useAuth();
 
   const displayName = user?.user_metadata.user_name || user?.email;
 
-  // Debug log to check auth state
   console.log('Current auth state:', user);
 
   const handleClick = (page: string) => {
-    navigate(page === 'home' ? '/' : `/${page}`);
+    console.log(`Link clicked: ${page}`);
     setMenuOpen(false);
   };
 
@@ -25,39 +22,46 @@ export const Navbar = () => {
         <div className="flex justify-between h-16 items-center">
           {/* Logo */}
           <div className="flex items-center">
-            <div className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+            <Link
+              to="/"
+              className="text-xl font-semibold text-gray-800 dark:text-gray-100"
+              onClick={() => handleClick('home')}
+            >
               We-Create
-            </div>
+            </Link>
           </div>
 
           {/* Desktop Links */}
           <div className="hidden md:flex items-center space-x-6">
-            <button
+            <Link
+              to="/"
               onClick={() => handleClick('home')}
               className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
             >
               Home
-            </button>
-            <button
+            </Link>
+            <Link
+              to="/create"
               onClick={() => handleClick('create')}
               className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
             >
               Create Post
-            </button>
-            <button
+            </Link>
+            <Link
+              to="/communities"
               onClick={() => handleClick('communities')}
               className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
             >
               Communities
-            </button>
-            <button
+            </Link>
+            <Link
+              to="/community/create"
               onClick={() => handleClick('community/create')}
               className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
             >
               Create Community
-            </button>
+            </Link>
 
-            {/* Auth Section */}
             {user ? (
               <div className="flex items-center space-x-3">
                 {user.user_metadata.avatar_url && (
@@ -146,30 +150,34 @@ export const Navbar = () => {
         }`}
       >
         <div className="px-4 pt-2 pb-3 space-y-1 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border-b border-gray-100 dark:border-gray-800">
-          <button
+          <Link
+            to="/"
             onClick={() => handleClick('home')}
             className="block w-full text-left px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
           >
             Home
-          </button>
-          <button
+          </Link>
+          <Link
+            to="/create"
             onClick={() => handleClick('create')}
             className="block w-full text-left px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
           >
             Create Post
-          </button>
-          <button
+          </Link>
+          <Link
+            to="/communities"
             onClick={() => handleClick('communities')}
             className="block w-full text-left px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
           >
             Communities
-          </button>
-          <button
+          </Link>
+          <Link
+            to="/community/create"
             onClick={() => handleClick('community/create')}
             className="block w-full text-left px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
           >
             Create Community
-          </button>
+          </Link>
 
           {/* Mobile Auth Section */}
           <div className="pt-3 border-t border-gray-100 dark:border-gray-800">

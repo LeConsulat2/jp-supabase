@@ -14,50 +14,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
     });
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('Auth state changed:', event, session?.user);
+    const { data: listener } = supabase.auth.onAuthStateChange((_, session) => {
       setUser(session?.user ?? null);
     });
 
     return () => {
-      subscription.unsubscribe();
+      listener.subscription.unsubscribe();
     };
   }, []);
 
-  const signInWithGitHub = async () => {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'github',
-      options: {
-        redirectTo: window.location.origin,
-      },
-    });
-    if (error) {
-      console.error('❌ Github Sign-in error', error.message);
-    } else {
-      console.log('✅ Redirecting to Github OAuth...', data);
-    }
+  const signInWithGitHub = () => {
+    supabase.auth.signInWithOAuth({ provider: 'github' });
   };
 
-  const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error('❌ Sign out error', error.message);
-    } else {
-      setUser(null);
-    }
+  const signOut = () => {
+    supabase.auth.signOut();
   };
 
   return (
     <AuthContext.Provider value={{ user, signInWithGitHub, signOut }}>
-      {children}
+      {' '}
+      {children}{' '}
     </AuthContext.Provider>
   );
 };
@@ -65,7 +46,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error('useAuth must be used within the AuthProvider');
   }
   return context;
 };
