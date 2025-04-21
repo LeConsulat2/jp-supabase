@@ -37,7 +37,7 @@ export const CreatePost = () => {
   const [preview, setPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { mutate } = useMutation({
+  const { mutate, isError } = useMutation({
     mutationFn: (data: { post: PostInput; imageFile: File }) =>
       createPost(data.post, data.imageFile),
     onMutate: () => setIsSubmitting(true),
@@ -183,6 +183,7 @@ export const CreatePost = () => {
             >
               {isSubmitting ? 'Publishing...' : 'Publish Post'}
             </button>
+            {isError && <p className="text-red-500"> Error Crreating Post</p>}
           </div>
         </form>
       </div>
