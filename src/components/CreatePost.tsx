@@ -37,18 +37,27 @@ export const CreatePost = () => {
   const [preview, setPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { mutate, isError } = useMutation({
+  const {
+    mutate,
+    isError,
+    error: mutationError,
+  } = useMutation({
     mutationFn: (data: { post: PostInput; imageFile: File }) =>
       createPost(data.post, data.imageFile),
     onMutate: () => setIsSubmitting(true),
     onSuccess: () => {
+      console.log('Post created successfully!');
       setTitle('');
       setContent('');
       setSelectedFile(null);
       setPreview(null);
       setIsSubmitting(false);
+      // Optionally: Add navigation or a success message here
     },
-    onError: () => setIsSubmitting(false),
+    onError: (error) => {
+      console.error('Error during mutation:', error); // Log the actual error
+      setIsSubmitting(false);
+    },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -183,7 +192,11 @@ export const CreatePost = () => {
             >
               {isSubmitting ? 'Publishing...' : 'Publish Post'}
             </button>
-            {isError && <p className="text-red-500"> Error Crreating Post</p>}
+            {isError && (
+              <p className="text-red-400 mt-2 text-center text-sm">
+                Error Creating Post: {mutationError?.message || 'Unknown error'}
+              </p>
+            )}
           </div>
         </form>
       </div>
