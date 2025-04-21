@@ -5,11 +5,14 @@ export const CreatePostPage = () => {
   const navigate = useNavigate();
 
   return (
+    // 🌌 전체 배경: 파란 계열 그라디언트 + 화면 꽉 채움
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-600 to-sky-400">
+      {/* 📦 콘텐츠 중앙 정렬 + 반응형 패딩 */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
+        {/* 🔼 헤더 영역 (상단 Back 버튼) */}
         <header className="py-6">
           <div className="flex items-center justify-between">
+            {/* ⬅️ 뒤로가기 버튼 */}
             <button
               onClick={() => navigate(-1)}
               className="flex items-center text-sky-100 hover:text-white transition-colors"
@@ -28,12 +31,15 @@ export const CreatePostPage = () => {
               </svg>
               Back
             </button>
-            <div className="w-20"></div> {/* Placeholder for symmetry */}
+
+            {/* ↔️ 오른쪽 공간 맞추기 위한 빈 영역 (정렬용) */}
+            <div className="w-20"></div>
           </div>
         </header>
 
-        {/* Main Content */}
+        {/* 🧠 메인 콘텐츠 */}
         <main className="pb-16">
+          {/* 📝 타이틀 + 설명 */}
           <div className="mb-8 text-center">
             <h2 className="text-4xl font-bold text-white mb-2">
               Share Your Story
@@ -44,6 +50,7 @@ export const CreatePostPage = () => {
             </p>
           </div>
 
+          {/* ✅ 실제 CreatePost 컴포넌트 삽입 */}
           <CreatePost />
         </main>
       </div>
