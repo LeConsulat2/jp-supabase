@@ -1,15 +1,19 @@
+// import 구역
 import { useMutation } from '@tanstack/react-query';
 import { ChangeEvent, useState } from 'react';
 import { supabase } from '../supabase-client';
 
+// 게시물 입력값 타입
 interface PostInput {
   title: string;
   content: string;
 }
 
+// Supabase에 게시물 + 이미지 업로드 처리 함수
 const createPost = async (post: PostInput, imageFile: File) => {
   const filePath = `${post.title}-${Date.now()}-${imageFile.name}`;
 
+  // 🧾 Supabase Storage에 이미지 업로드
   const { error: uploadError } = await supabase.storage
     .from('post-images')
     .upload(filePath, imageFile);
@@ -18,10 +22,12 @@ const createPost = async (post: PostInput, imageFile: File) => {
     throw new Error(uploadError.message);
   }
 
+  // 🌐 이미지 공개 URL 가져오기
   const { data: publicUrlData } = supabase.storage
     .from('post-images')
     .getPublicUrl(filePath);
 
+  // 📥 posts 테이블에 새로운 row 추가
   const { data, error } = await supabase
     .from('posts')
     .insert({ ...post, image_url: publicUrlData.publicUrl });
@@ -31,12 +37,14 @@ const createPost = async (post: PostInput, imageFile: File) => {
 };
 
 export const CreatePost = () => {
+  // 📌 상태 선언
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // 🔁 게시물 업로드 mutation 정의
   const {
     mutate,
     isError,
@@ -52,26 +60,26 @@ export const CreatePost = () => {
       setSelectedFile(null);
       setPreview(null);
       setIsSubmitting(false);
-      // Optionally: Add navigation or a success message here
     },
     onError: (error) => {
-      console.error('Error during mutation:', error); // Log the actual error
+      console.error('Error during mutation:', error);
       setIsSubmitting(false);
     },
   });
 
+  // ✅ form 제출
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedFile) return;
     mutate({ post: { title, content }, imageFile: selectedFile });
   };
 
+  // ✅ 파일 선택 + 미리보기 생성
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setSelectedFile(file);
 
-      // Create image preview
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreview(reader.result as string);
@@ -81,15 +89,20 @@ export const CreatePost = () => {
   };
 
   return (
+    // 🟦 전체 배경: 파란색 계열 그라디언트 + 가운데 정렬
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-600 to-sky-400 flex items-center justify-center px-4 py-12">
+      {/* 🧊 카드형 레이아웃: blur + 둥근 모서리 + 그림자 */}
       <div className="w-full max-w-2xl bg-white/10 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden">
+        {/* 🔷 헤더 영역: 파란색 배경 + 중앙 제목 */}
         <div className="bg-gradient-to-r from-blue-700 to-sky-500 py-6 px-8">
           <h2 className="text-3xl font-bold text-white text-center">
             Create New Post
           </h2>
         </div>
 
+        {/* ✍️ Form 입력 영역 */}
         <form onSubmit={handleSubmit} className="p-8 space-y-6">
+          {/* 제목 입력 */}
           <div className="space-y-2">
             <label
               htmlFor="title"
@@ -103,11 +116,12 @@ export const CreatePost = () => {
               value={title}
               required
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-white/20 border border-sky-200/30 text-white placeholder-sky-200 focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-transparent transition duration-200"
+              className="w-full px-4 py-3 rounded-xl bg-white/20 border border-sky-200/30 text-white placeholder-sky-200 focus:outline-none focus:ring-2 focus:ring-sky-300 transition duration-200"
               placeholder="Enter your post title..."
             />
           </div>
 
+          {/* 본문 입력 */}
           <div className="space-y-2">
             <label
               htmlFor="content"
@@ -121,17 +135,19 @@ export const CreatePost = () => {
               required
               rows={6}
               onChange={(e) => setContent(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-white/20 border border-sky-200/30 text-white placeholder-sky-200 focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-transparent transition duration-200 resize-none"
+              className="w-full px-4 py-3 rounded-xl bg-white/20 border border-sky-200/30 text-white placeholder-sky-200 focus:outline-none focus:ring-2 focus:ring-sky-300 transition duration-200 resize-none"
               placeholder="Share your thoughts..."
             />
           </div>
 
+          {/* 이미지 업로드 */}
           <div className="space-y-3">
             <label className="block text-sm font-medium text-sky-100">
               Featured Image
             </label>
 
-            <div className="relative border-2 border-dashed border-sky-300/50 rounded-xl p-4 transition-all hover:border-sky-300 bg-blue-900/30">
+            {/* 📦 이미지 업로드 박스 - dashed border + 파일 미리보기 */}
+            <div className="relative border-2 border-dashed border-sky-300/50 rounded-xl p-4 hover:border-sky-300 bg-blue-900/30">
               <input
                 type="file"
                 id="image"
@@ -141,6 +157,7 @@ export const CreatePost = () => {
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
               />
 
+              {/* 📷 이미지 미리보기 or 아이콘 */}
               <div className="text-center p-4">
                 {preview ? (
                   <div className="space-y-3">
@@ -157,7 +174,6 @@ export const CreatePost = () => {
                   <div className="space-y-3">
                     <div className="mx-auto w-12 h-12 rounded-full bg-sky-600/50 flex items-center justify-center">
                       <svg
-                        xmlns="http://www.w3.org/2000/svg"
                         className="h-6 w-6 text-sky-100"
                         fill="none"
                         viewBox="0 0 24 24"
@@ -180,6 +196,7 @@ export const CreatePost = () => {
             </div>
           </div>
 
+          {/* 제출 버튼 */}
           <div className="pt-4">
             <button
               type="submit"
@@ -192,6 +209,8 @@ export const CreatePost = () => {
             >
               {isSubmitting ? 'Publishing...' : 'Publish Post'}
             </button>
+
+            {/* 에러 메시지 */}
             {isError && (
               <p className="text-red-400 mt-2 text-center text-sm">
                 Error Creating Post: {mutationError?.message || 'Unknown error'}
